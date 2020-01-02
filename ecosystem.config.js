@@ -1,7 +1,8 @@
 module.exports = {
   apps : [{
-    name: 'youzi-thanks',
-    script: './src/index.js',
+    name: 'record-bili',
+    script: './index.js',
+    "node_args": "--experimental-modules",
 
     // Options reference: https://pm2.keymetrics.io/docs/usage/application-declaration/
     args: 'one two',
