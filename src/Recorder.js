@@ -35,7 +35,13 @@ class Recorder {
     let stream = fs.createWriteStream(this.tmpFilePath)
     this.req = request({
       method: 'GET',
-      url: this.url
+      url: this.url,
+      headers:{
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Host': 'txy.live-play.acgvideo.com',
+        'Cache-Control': 'no-cache',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.103 Safari/537.36 Vivaldi/2.1.1337.47'
+      }
     })
     this.req.on('end',()=>{
       // Logger.debug('http end')
