@@ -15,6 +15,7 @@ if(isMainThread){
   let exit = false //线程退出会检查这个变量。如果为真则退出程序
 
   function recready(room){
+    Logger.notice(`ready new Recorder`)
     let recorder =  new Recorder({
       nickname: room.nickname,
       roomid: room.roomid,
@@ -57,7 +58,9 @@ if(isMainThread){
         }
         worker.on('exit', ()=>{
           Threads--;
+          Logger.debug(`worker.exit,剩余:${Threads}`)
           if(Threads === 0 && exit){
+            Logger.debug(`process.exit`)
             process.exit()
           }
         }) 
@@ -130,11 +133,13 @@ if(isMainThread){
           Logger.notice(`删除临时文件：${tmpFilename}`);
         });
       }
+      Logger.notice(`子进程退出：${tmpFilename}`)
       process.exit();
     },
     error(e){
       Logger.debug(`修复失败:${tmpFilename}`);
       Logger.debug(e)
+      Logger.notice(`error 子进程退出：${tmpFilename}`)
       process.exit();
     }
   })

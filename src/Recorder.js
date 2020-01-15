@@ -26,6 +26,7 @@ class Recorder {
 
   async start(){
     // this.url = await Recorder.getPlayUrl(this.roomid)
+    Logger.notice(`获取播放地址`)
     this.url = await getPlayUrl(this.roomid)
     this.rec()
   }
@@ -89,9 +90,9 @@ class Recorder {
       this.recEndCallbackResult.retry = this.retry
       this.recEndCallback(this.recEndCallbackResult)
     }else{
-      // Logger.debug('未满足修复条件')
-      // Logger.debug(`isFinish: ${this.isFinish}`)
-      // Logger.debug(`isHttpEnd: ${this.isHttpEnd}`)
+      Logger.debug('未满足修复条件')
+      Logger.debug(`isFinish: ${this.isFinish}`)
+      Logger.debug(`isHttpEnd: ${this.isHttpEnd}`)
     }
 
   }
