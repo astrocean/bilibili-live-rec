@@ -1,5 +1,6 @@
 const axios = require('axios')
 const WebSocket = require('ws');
+const initSave=require('./save');
 const TextEncoder = require('util').TextEncoder;
 const TextDecoder = require('util').TextDecoder;
 const textEncoder = new TextEncoder('utf-8');
@@ -137,6 +138,106 @@ class WSRoom {
     this.autorelink = false
     this.ws.close()
   }
+
+   /**
+     * 弹幕解析
+     * @param {any} message 消息
+     */
+    static danmakuMessageDecoder (message) {
+      let [
+        danmakuSetting=[],
+        msg,
+        userInfo=[],
+        medal=[],
+        rankInfo=[],
+        title=[],
+        info6,
+        guardLevel,
+        validation
+             //    {
+             //     ts: message.info[9].ts || 0,
+             //     ct: message.info[9].ct || ''
+             // }
+       ]=message.info;
+       let [
+         ka,
+         mode,// 4:bottom 6:reverse 1:scroll 5:top
+         fontSize,
+         color,
+         sendTime,
+         dmid,
+         danmakuSetting6,
+         danmakuSetting7,
+         danmakuSetting8,
+         type,
+         chatBubbleType
+       ]=danmakuSetting;
+       let [
+         uid,
+         uname,
+         isAdmin,
+         isVip,
+         isSvip,
+         userInfoRank,
+         verify,
+         usernameColor
+       ]=userInfo;
+       let [
+         medalLevel,
+         label,//'--'
+         anchorUsername,//'--'
+         shortRoomID,//// not right
+         unknown, // in official code......
+         special
+       ]=medal;
+       let [
+         rankInfoLevel,
+         rankInfo1,
+         rankInfo2,
+         rankInfoRank
+       ]=rankInfo;
+      
+      return {
+         ka,
+         mode,// 4:bottom 6:reverse 1:scroll 5:top
+         fontSize,
+         color,
+         sendTime,
+         dmid,
+         danmakuSetting6,
+         danmakuSetting7,
+         danmakuSetting8,
+         type,
+         chatBubbleType,
+   
+         uid,
+         uname,
+         isAdmin,
+         isVip,
+         isSvip,
+         userInfoRank,
+         verify,
+         usernameColor,
+   
+         medalLevel,
+         label,//'--'
+         anchorUsername,//'--'
+         shortRoomID,//// not right
+         unknown, // in official code......
+         special,
+   
+   
+         rankInfoLevel,
+         rankInfo1,
+         rankInfo2,
+         rankInfoRank,
+   
+         msg,
+         title,
+         guardLevel,//['', '总督', '提督', '舰长']
+         validation
+      };
+    }
 }
 
 function relink(oldRoomObj){
@@ -231,13 +332,44 @@ async function delEvent(roomid,type,eventId){
     }
   }
 }
+
+
+
 function listen(room,recready){
   if(!room.roomid) throw new Error('Not fount roomid')
+  let popularityCount=0;
+let popularity=0;
+let save=initSave(room.roomid);
+save.startSave();
+process.on('exit', (code) => {
+  save.startSave(true);
+  console.log('listen 进程退出码是:', code, process.pid);
+});
   ListenRoom(room.roomid,{
     opencb: function(){
       Logger.notice(`打开直播间链接: ${room.nickname}`)
+     
     },
     msgcb: function(body){
+      // console.log(body);
+      let data=body;
+      if(data.info){
+        let messageInfo=WSRoom.danmakuMessageDecoder(data);
+        save.save(messageInfo,data);
+      }else if(data.cmd==='HEART'){
+        ++popularityCount;
+        if(popularity!==data.count&&popularityCount%180===0){
+          let popularity={
+            sendTime:Date.now(),
+            popularity:data.count
+          };
+          save.save(popularity,popularity);
+        }
+      }else if(data.cmd){
+        save.save(data,data);
+      }else{
+        save.save(null,data);
+      }
       if (body.cmd === "LIVE") {
         if(!room.status){
           room.status = true

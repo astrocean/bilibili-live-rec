@@ -6,7 +6,7 @@ module.exports = {
   RoomList: [
     {
       nickname: '柚子',
-      roomid:21679473
+      roomid:21679473//
     }
   ]
 }

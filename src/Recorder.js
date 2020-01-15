@@ -15,11 +15,11 @@ class Recorder {
     this.httpResCallback = httpResCallback
     this.recEndCallback = recEndCallback
     this.retry = true //主动stop时设为false
-    this.tmpFilename = `${format(new Date(),'MMdd')}-${this.nickname}-${(new Date()).valueOf()}.flv`
+    this.tmpFilename = `${format(new Date(),'yyyy-MM-dd_HH_mm_ss')}-${this.nickname}-${(new Date()).valueOf()}.flv`
     this.recEndCallbackResult = {
       tmpFilename: this.tmpFilename,
       nickname: this.nickname,
-      time: format(new Date(),'MMdd-HHmm')
+      time: format(new Date(),'yyyy-MM-dd_HH_mm_ss')
     }
     this.start()
   }
